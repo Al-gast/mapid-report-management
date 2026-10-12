@@ -4,6 +4,9 @@ import cookieParser from "cookie-parser";
 
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
+import {
+  reportsRouter,
+} from "./modules/reports/reports.routes.js";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import {
