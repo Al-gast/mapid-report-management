@@ -74,7 +74,8 @@ describe("Approval Workflow", () => {
     const result = await changeReportStatus(
       reportId,
       approverId,
-      "approved"
+      "approved",
+        "Approved for testing"
     );
 
     expect(result.kind).toBe("updated");
@@ -104,7 +105,8 @@ describe("Approval Workflow", () => {
     const result = await changeReportStatus(
       reportId,
       approverId,
-      "approved"
+      "approved",
+      "Attempting to approve again"
     );
 
     expect(result.kind).toBe("unchanged");
@@ -123,7 +125,8 @@ describe("Approval Workflow", () => {
     const result = await changeReportStatus(
       reportId,
       approverId,
-      "rejected"
+      "rejected",
+        "Attempting to reject a non-existent report"
     );
 
     expect(result.kind).toBe("not_found");
@@ -150,7 +153,8 @@ describe("Approval Workflow", () => {
       changeReportStatus(
         reportId,
         approverId,
-        "approved"
+        "approved",
+        "Attempting to approve with failing history insert"
       )
     ).rejects.toThrow("History insert failed");
 

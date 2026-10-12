@@ -962,3 +962,64 @@ button:disabled {
   width: 18px;
   height: 18px;
 }
+
+
+/* Approval Reason */
+
+.decision-confirmation .form-group {
+  margin-top: 20px;
+}
+
+.decision-confirmation textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  background: white;
+  color: #172033;
+
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.decision-confirmation textarea:focus {
+  outline: 2px solid #93c5fd;
+  border-color: #2563eb;
+}
+
+.character-count {
+  display: block;
+  margin-top: 4px;
+
+  color: #64748b;
+  font-size: 12px;
+  text-align: right;
+}
+
+.history-reason {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.history-reason strong {
+  display: block;
+  font-size: 12px;
+  color: #475569;
+}
+
+.history-reason p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.approval-refresh {
+  margin-top: 16px;
+}

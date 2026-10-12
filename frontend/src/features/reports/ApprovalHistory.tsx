@@ -158,6 +158,26 @@ export default function ApprovalHistory({
                       </span>
                     </div>
 
+                    <div className="history-reason">
+                    {item.reason ? (
+                        <>
+                        <strong>
+                            {item.new_status === "rejected"
+                            ? "Alasan Penolakan"
+                            : "Catatan Persetujuan"}
+                        </strong>
+
+                        <p>{item.reason}</p>
+                        </>
+                    ) : (
+                        <p className="muted">
+                        {item.new_status === "rejected"
+                            ? "Alasan tidak tersedia (riwayat lama)."
+                            : "Tidak ada catatan tambahan."}
+                        </p>
+                    )}
+                    </div>
+
                     <time dateTime={item.decided_at}>
                       {formatDate(item.decided_at)}
                     </time>

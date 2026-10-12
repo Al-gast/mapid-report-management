@@ -207,9 +207,10 @@ reportsRouter.patch(
     }
 
     const result = await changeReportStatus(
-      paramsValidation.data.id,
-      req.authUser!.id,
-      bodyValidation.data.status
+        paramsValidation.data.id,
+        req.authUser!.id,
+        bodyValidation.data.status,
+        bodyValidation.data.reason ?? null
     );
 
     if (result.kind === "not_found") {

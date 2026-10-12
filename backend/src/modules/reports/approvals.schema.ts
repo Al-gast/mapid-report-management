@@ -1,8 +1,25 @@
 import { z } from "zod";
 
-export const updateStatusSchema = z.strictObject({
-  status: z.enum(["approved", "rejected"]),
-});
+export const updateStatusSchema = z
+  .strictObject({
+    status: z.enum(["approved", "rejected"]),
+
+    reason: z
+      .string()
+      .trim()
+      .min(1)
+      .max(1000)
+      .optional(),
+  })
+  .refine(
+    (data) =>
+      data.status !== "rejected" ||
+      Boolean(data.reason),
+    {
+      path: ["reason"],
+      message: "Alasan wajib diisi saat reject",
+    }
+  );
 
 export const approvalHistoryQuerySchema = z.strictObject({
   page: z.coerce.number()

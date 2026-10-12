@@ -17,6 +17,7 @@ export type ApprovalHistory = {
   previous_status: ReportStatus;
   new_status: ApprovalDecision;
   decided_at: Date;
+  reason: string | null;
 };
 
 export type ChangeStatusResult =
@@ -31,7 +32,8 @@ export type ChangeStatusResult =
 export async function changeReportStatus(
   reportId: string,
   approverId: string,
-  newStatus: ApprovalDecision
+  newStatus: ApprovalDecision,
+  reason: string | null
 ): Promise<ChangeStatusResult> {
   const client = await pool.connect();
 
@@ -90,28 +92,31 @@ export async function changeReportStatus(
 
     // Simpan keputusan sebagai history baru
     const historyResult =
-      await client.query<ApprovalHistory>(
-        `INSERT INTO app.report_approval_history (
-           report_id,
-           approver_id,
-           previous_status,
-           new_status
-         )
-         VALUES ($1, $2, $3, $4)
-         RETURNING
-           id,
-           report_id,
-           approver_id,
-           previous_status,
-           new_status,
-           decided_at`,
-        [
-          reportId,
-          approverId,
-          report.status,
-          newStatus,
-        ]
-      );
+  await client.query<ApprovalHistory>(
+    `INSERT INTO app.report_approval_history (
+       report_id,
+       approver_id,
+       previous_status,
+       new_status,
+       reason
+     )
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING
+       id,
+       report_id,
+       approver_id,
+       previous_status,
+       new_status,
+       reason,
+       decided_at`,
+    [
+      reportId,
+      approverId,
+      report.status,
+      newStatus,
+      reason,
+    ]
+  );
 
     await client.query("COMMIT");
     inTransaction = false;
@@ -171,7 +176,8 @@ export async function getApprovalHistory(
        u.name AS approver_name,
        h.previous_status,
        h.new_status,
-       h.decided_at
+       h.decided_at,
+       h.reason
      FROM app.report_approval_history h
      JOIN app.users u
        ON u.id = h.approver_id

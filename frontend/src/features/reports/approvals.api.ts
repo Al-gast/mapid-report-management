@@ -15,6 +15,7 @@ export type ApprovalRecord = {
   approver_id: string;
   previous_status: ReportStatus;
   new_status: ApprovalDecision;
+  reason: string | null;
   decided_at: string;
 };
 
@@ -49,19 +50,23 @@ type ApprovalHistoryResponse = {
 export const approvalsApi = {
   async changeStatus(
     reportId: string,
-    status: ApprovalDecision
-  ): Promise<Report> {
+    status: ApprovalDecision,
+    reason?: string
+    ): Promise<Report> {
     const response =
-      await apiRequest<ChangeStatusResponse>(
+        await apiRequest<ChangeStatusResponse>(
         `/api/reports/${encodeURIComponent(reportId)}/status`,
         {
-          method: "PATCH",
-          body: JSON.stringify({ status }),
+            method: "PATCH",
+            body: JSON.stringify({
+            status,
+            ...(reason ? { reason } : {}),
+            }),
         }
-      );
+        );
 
     return response.data.report;
-  },
+    },
 
   async history(
     reportId: string,

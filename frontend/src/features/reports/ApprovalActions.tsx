@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 import { ApiError } from "../../lib/api";
 
@@ -46,54 +46,92 @@ export default function ApprovalActions({
   const [selected, setSelected] =
     useState<ApprovalDecision | null>(null);
 
+  const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [hasConflict, setHasConflict] = useState(false);
 
+  const reasonRequired = selected === "rejected";
+
+  const availableDecisions = decisions.filter(
+    (item) => item.status !== report.status
+  );
+
+  const canConfirm =
+    selected !== null &&
+    !saving &&
+    !hasConflict &&
+    (!reasonRequired || reason.trim().length > 0);
+
   function chooseDecision(status: ApprovalDecision) {
-    if (saving) return;
+    if (saving || hasConflict) return;
 
     setSelected(status);
+    setReason("");
     setError("");
-    setHasConflict(false);
   }
 
-  async function confirmDecision() {
-    if (!selected || saving) return;
+  function cancelDecision() {
+    if (saving) return;
+
+    setSelected(null);
+    setReason("");
+    setError("");
+  }
+
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    if (!selected || !canConfirm) return;
+
+    const normalizedReason = reason.trim();
+
+    if (normalizedReason.length > 1000) {
+      setError("Alasan maksimal 1000 karakter.");
+      return;
+    }
 
     setSaving(true);
     setError("");
-    setHasConflict(false);
 
     try {
       const updatedReport =
         await approvalsApi.changeStatus(
           report.id,
-          selected
+          selected,
+          normalizedReason || undefined
         );
 
       setSelected(null);
+      setReason("");
+
       onStatusChanged(updatedReport);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        if (error.status === 409) {
-          setError(
-            "Status laporan sudah berubah. " +
-            "Muat ulang sebelum mengambil keputusan."
-          );
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 409) {
           setHasConflict(true);
-        } else if (error.status === 403) {
           setError(
-            "Akun ini tidak memiliki izin untuk approval."
+            "Status laporan sudah berubah atau keputusan " +
+            "tidak menghasilkan perubahan. Muat ulang laporan."
           );
-        } else if (error.status === 404) {
+        } else if (err.status === 400) {
+          setError(
+            "Data keputusan tidak valid. Periksa alasan."
+          );
+        } else if (err.status === 403) {
+          setError(
+            "Akun ini tidak memiliki izin approval."
+          );
+        } else if (err.status === 404) {
           setError("Laporan tidak ditemukan.");
         } else {
-          setError(error.message);
+          setError(err.message);
         }
       } else {
         setError(
-          "Gagal mengubah status laporan. Coba lagi."
+          "Gagal menyimpan keputusan. Silakan coba lagi."
         );
       }
     } finally {
@@ -101,18 +139,13 @@ export default function ApprovalActions({
     }
   }
 
-  const availableDecisions = decisions.filter(
-    (item) => item.status !== report.status
-  );
-
   return (
     <section className="content-card approval-panel">
       <h2>Keputusan Persetujuan</h2>
 
       <p className="muted">
-        Sebagai Approver, Anda dapat mengubah keputusan
-        laporan. Setiap perubahan akan tercatat dalam
-        approval history.
+        Setiap perubahan status akan dicatat
+        dalam approval history.
       </p>
 
       <div className="decision-actions">
@@ -120,8 +153,10 @@ export default function ApprovalActions({
           <button
             key={item.status}
             type="button"
-            className={`decision-button ${item.className}`}
-            disabled={saving}
+            className={
+              `decision-button ${item.className}`
+            }
+            disabled={saving || hasConflict}
             onClick={() => chooseDecision(item.status)}
           >
             {item.label}
@@ -130,59 +165,100 @@ export default function ApprovalActions({
       </div>
 
       {selected && (
-        <div className="decision-confirmation">
+        <form
+          className="decision-confirmation"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <h3>Konfirmasi Keputusan</h3>
 
           <p>
             Ubah status laporan dari{" "}
-            <strong>{report.status}</strong> menjadi{" "}
+            <strong>{report.status}</strong>{" "}
+            menjadi{" "}
             <strong>{decisionLabels[selected]}</strong>?
           </p>
 
-          <p className="muted">
-            Keputusan ini akan disimpan dalam riwayat
-            persetujuan.
-          </p>
+          <div className="form-group">
+            <label htmlFor="approval-reason">
+              {reasonRequired
+                ? "Alasan Penolakan *"
+                : "Catatan Persetujuan (opsional)"}
+            </label>
+
+            <textarea
+              id="approval-reason"
+              name="reason"
+              value={reason}
+              onChange={(event) =>
+                setReason(event.target.value)
+              }
+              rows={4}
+              minLength={reasonRequired ? 1 : undefined}
+              maxLength={1000}
+              required={reasonRequired}
+              disabled={saving || hasConflict}
+              placeholder={
+                reasonRequired
+                  ? "Jelaskan mengapa laporan ditolak..."
+                  : "Tambahkan catatan jika diperlukan..."
+              }
+            />
+
+            <span className="character-count">
+              {reason.length}/1000 karakter
+            </span>
+
+            {reasonRequired && (
+              <p className="muted">
+                Alasan penolakan wajib diisi.
+              </p>
+            )}
+          </div>
+
+          {error && (
+            <p className="error-message" role="alert">
+              {error}
+            </p>
+          )}
 
           <div className="confirmation-actions">
             <button
               type="button"
               className="secondary-button"
+              onClick={cancelDecision}
               disabled={saving}
-              onClick={() => setSelected(null)}
             >
               Batal
             </button>
 
             <button
-              type="button"
+              type="submit"
               className="primary-button"
-              disabled={saving || hasConflict}
-              onClick={() => void confirmDecision()}
+              disabled={!canConfirm}
             >
               {saving
                 ? "Menyimpan..."
-                : "Konfirmasi"}
+                : `Konfirmasi ${decisionLabels[selected]}`}
             </button>
           </div>
-        </div>
+        </form>
       )}
 
-      {error && (
-        <div className="approval-error" role="alert">
-          <p className="error-message">{error}</p>
+      {error && !selected && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
 
-          {hasConflict && (
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={onRefresh}
-              disabled={saving}
-            >
-              Muat Ulang Laporan
-            </button>
-          )}
-        </div>
+      {hasConflict && (
+        <button
+          type="button"
+          className="secondary-button approval-refresh"
+          onClick={onRefresh}
+          disabled={saving}
+        >
+          Muat Ulang Laporan
+        </button>
       )}
     </section>
   );
