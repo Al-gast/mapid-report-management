@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 import { useAuth } from "../features/auth/useAuth";
 import {
@@ -95,14 +96,23 @@ export default function ReportsPage() {
 
   return (
     <section className="reports-page">
-      <div className="page-heading">
+      <div className="page-heading page-heading-actions">
         <div>
-          <h1>{title}</h1>
-          <p className="muted">
+            <h1>{title}</h1>
+            <p className="muted">
             Daftar laporan lapangan dan status persetujuan.
-          </p>
+            </p>
         </div>
-      </div>
+
+        {user?.role === "pelapor" && (
+            <Link
+            to="/dashboard/reports/new"
+            className="primary-link"
+            >
+            + Tambah Laporan
+            </Link>
+        )}
+    </div>
 
       <div className="content-card">
         <div className="report-toolbar">
@@ -169,6 +179,7 @@ export default function ReportsPage() {
                       <th>Nama laporan</th>
                       <th>Status</th>
                       <th>Dibuat</th>
+                      <th>Aksi</th>
                     </tr>
                   </thead>
 
@@ -191,6 +202,11 @@ export default function ReportsPage() {
                         </td>
 
                         <td>{formatDate(report.created_at)}</td>
+                        <td>
+                            <Link to={`/dashboard/reports/${report.id}`}>
+                                Lihat Detail
+                            </Link>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

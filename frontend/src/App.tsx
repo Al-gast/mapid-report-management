@@ -13,6 +13,8 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardPage from "./pages/DashboardPage";
 import ReportsPage from "./pages/ReportsPage";
 import LoginPage from "./pages/LoginPage";
+import ReportDetailPage from "./pages/ReportDetailPage";
+import ReportFormPage from "./pages/ReportFormPage";
 
 function ProtectedRoute({
   children,
@@ -79,7 +81,26 @@ export default function App() {
         }
       >
         <Route index element={<DashboardPage />} />
-        <Route path="reports" element={<ReportsPage />} />
+
+        <Route
+          path="reports"
+          element={<ReportsPage />}
+        />
+
+        <Route
+          path="reports/new"
+          element={<ReportFormPage mode="create" />}
+        />
+
+        <Route
+          path="reports/:id"
+          element={<ReportDetailPage />}
+        />
+
+        <Route
+          path="reports/:id/edit"
+          element={<ReportFormPage mode="edit" />}
+        />
       </Route>
 
       <Route

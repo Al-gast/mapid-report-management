@@ -16,6 +16,11 @@ export type Report = {
   updated_at: string;
 };
 
+export type ReportInput = {
+  name: string;
+  description: string;
+};
+
 export type ReportListFilters = {
   page: number;
   limit: number;
@@ -38,6 +43,14 @@ type ReportListResponse = {
   data: ReportListData;
 };
 
+type ReportResponse = {
+  success: boolean;
+  message?: string;
+  data: {
+    report: Report;
+  };
+};
+
 export const reportsApi = {
   async list(filters: ReportListFilters) {
     const params = new URLSearchParams({
@@ -55,5 +68,40 @@ export const reportsApi = {
     );
 
     return response.data;
+  },
+
+  async detail(id: string): Promise<Report> {
+    const response = await apiRequest<ReportResponse>(
+      `/api/reports/${encodeURIComponent(id)}`
+    );
+
+    return response.data.report;
+  },
+
+  async create(input: ReportInput): Promise<Report> {
+    const response = await apiRequest<ReportResponse>(
+      "/api/reports",
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      }
+    );
+
+    return response.data.report;
+  },
+
+  async update(
+    id: string,
+    input: Partial<ReportInput>
+  ): Promise<Report> {
+    const response = await apiRequest<ReportResponse>(
+      `/api/reports/${encodeURIComponent(id)}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(input),
+      }
+    );
+
+    return response.data.report;
   },
 };
