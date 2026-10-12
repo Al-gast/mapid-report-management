@@ -568,3 +568,192 @@ button:disabled {
     text-align: center;
   }
 }
+
+
+/* Approval Workflow */
+
+.report-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.report-detail-page .page-heading {
+  margin-bottom: 0;
+}
+
+.report-heading-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.report-heading-buttons .primary-link {
+  margin-top: 0;
+}
+
+.approval-panel {
+  padding: 28px;
+}
+
+.approval-panel h2 {
+  margin-top: 0;
+}
+
+.decision-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.decision-button {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  color: white;
+  font-weight: 600;
+}
+
+.decision-approve {
+  background: #15803d;
+}
+
+.decision-approve:hover:not(:disabled) {
+  background: #166534;
+}
+
+.decision-reject {
+  background: #b91c1c;
+}
+
+.decision-reject:hover:not(:disabled) {
+  background: #991b1b;
+}
+
+.decision-confirmation {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #eff6ff;
+}
+
+.decision-confirmation h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.confirmation-actions .primary-button {
+  width: auto;
+  margin-top: 0;
+  padding: 10px 20px;
+}
+
+.approval-error {
+  margin-top: 20px;
+}
+
+.approval-history-panel {
+  overflow: hidden;
+}
+
+.approval-history-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.approval-history-heading h2 {
+  margin: 0;
+}
+
+.approval-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 24px;
+}
+
+.approval-history-item {
+  position: relative;
+  border-left: 2px solid #cbd5e1;
+  padding: 0 0 24px 22px;
+}
+
+.approval-history-item:last-child {
+  padding-bottom: 0;
+}
+
+.approval-history-item::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2563eb;
+  left: -6px;
+  top: 4px;
+}
+
+.history-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-content strong {
+  font-size: 14px;
+}
+
+.history-status-change {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.history-content time {
+  color: #64748b;
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .approval-panel {
+    padding: 18px;
+  }
+
+  .decision-actions {
+    flex-direction: column;
+  }
+
+  .decision-button {
+    width: 100%;
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+  }
+
+  .confirmation-actions .primary-button {
+    width: 100%;
+  }
+
+  .approval-history-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .approval-history-list {
+    padding: 18px;
+  }
+}

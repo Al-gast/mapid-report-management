@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
 import { useAuth } from "../features/auth/useAuth";
+
+import ApprovalActions from "../features/reports/ApprovalActions";
+import ApprovalHistory from "../features/reports/ApprovalHistory";
+
 import {
   reportsApi,
   type Report,
@@ -11,10 +15,17 @@ import {
 
 import { ApiError } from "../lib/api";
 
-type DetailState =
-  | { kind: "loading" }
-  | { kind: "success"; report: Report }
-  | { kind: "error"; message: string };
+type DetailResult =
+  | {
+      key: string;
+      kind: "success";
+      report: Report;
+    }
+  | {
+      key: string;
+      kind: "error";
+      message: string;
+    };
 
 const statusLabels: Record<ReportStatus, string> = {
   pending: "Pending",
@@ -23,7 +34,13 @@ const statusLabels: Record<ReportStatus, string> = {
 };
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleString("id-ID", {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -33,10 +50,13 @@ export default function ReportDetailPage() {
   const { id } = useParams<"id">();
   const { user } = useAuth();
 
-  const [result, setResult] = useState<{
-    id: string;
-    state: DetailState;
-  } | null>(null);
+  const [result, setResult] =
+    useState<DetailResult | null>(null);
+
+  const [reloadKey, setReloadKey] = useState(0);
+  const [historyVersion, setHistoryVersion] = useState(0);
+
+  const requestKey = `${id ?? ""}:${reloadKey}`;
 
   useEffect(() => {
     if (!id) return;
@@ -49,8 +69,9 @@ export default function ReportDetailPage() {
         if (!active) return;
 
         setResult({
-          id,
-          state: { kind: "success", report },
+          key: requestKey,
+          kind: "success",
+          report,
         });
       })
       .catch((error: unknown) => {
@@ -62,44 +83,73 @@ export default function ReportDetailPage() {
             : "Gagal mengambil detail laporan.";
 
         setResult({
-          id,
-          state: { kind: "error", message },
+          key: requestKey,
+          kind: "error",
+          message,
         });
       });
 
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, reloadKey, requestKey]);
+
+  function handleRefresh() {
+    setReloadKey((previous) => previous + 1);
+    setHistoryVersion((previous) => previous + 1);
+  }
+
+  function handleStatusChanged(updatedReport: Report) {
+    setResult({
+      key: requestKey,
+      kind: "success",
+      report: updatedReport,
+    });
+
+    // Refresh approval history setelah keputusan berhasil
+    setHistoryVersion((previous) => previous + 1);
+  }
 
   if (!id) {
     return <p>ID laporan tidak valid.</p>;
   }
 
-  const state: DetailState =
-    result?.id === id
-      ? result.state
-      : { kind: "loading" };
+  const current =
+    result?.key === requestKey ? result : null;
 
-  if (state.kind === "loading") {
-    return <p role="status">Memuat detail laporan...</p>;
+  if (!current) {
+    return (
+      <p role="status">
+        Memuat detail laporan...
+      </p>
+    );
   }
 
-  if (state.kind === "error") {
+  if (current.kind === "error") {
     return (
       <section className="content-card report-detail">
-        <p role="alert" className="error-message">
-          {state.message}
+        <p className="error-message" role="alert">
+          {current.message}
         </p>
 
-        <Link to="/dashboard/reports">
-          Kembali ke daftar laporan
-        </Link>
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={handleRefresh}
+        >
+          Coba Lagi
+        </button>
+
+        <p>
+          <Link to="/dashboard/reports">
+            Kembali ke daftar laporan
+          </Link>
+        </p>
       </section>
     );
   }
 
-  const { report } = state;
+  const { report } = current;
 
   const canEdit =
     user?.role === "pelapor" &&
@@ -107,7 +157,7 @@ export default function ReportDetailPage() {
     report.status === "pending";
 
   return (
-    <section>
+    <section className="report-detail-page">
       <div className="page-heading">
         <Link to="/dashboard/reports">
           ← Kembali ke laporan
@@ -116,6 +166,7 @@ export default function ReportDetailPage() {
         <div className="page-heading-actions">
           <div>
             <h1>{report.name}</h1>
+
             <span
               className={`status-badge status-${report.status}`}
             >
@@ -123,14 +174,24 @@ export default function ReportDetailPage() {
             </span>
           </div>
 
-          {canEdit && (
-            <Link
-              to={`/dashboard/reports/${report.id}/edit`}
-              className="primary-link"
+          <div className="report-heading-buttons">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={handleRefresh}
             >
-              Edit Laporan
-            </Link>
-          )}
+              Muat Ulang
+            </button>
+
+            {canEdit && (
+              <Link
+                to={`/dashboard/reports/${report.id}/edit`}
+                className="primary-link"
+              >
+                Edit Laporan
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
@@ -140,7 +201,9 @@ export default function ReportDetailPage() {
         <dl className="report-fields">
           <div>
             <dt>ID Laporan</dt>
-            <dd className="report-id">{report.id}</dd>
+            <dd className="report-id">
+              {report.id}
+            </dd>
           </div>
 
           <div>
@@ -169,6 +232,19 @@ export default function ReportDetailPage() {
             </p>
           )}
       </div>
+
+      {user?.role === "approver" && (
+        <ApprovalActions
+          report={report}
+          onStatusChanged={handleStatusChanged}
+          onRefresh={handleRefresh}
+        />
+      )}
+
+      <ApprovalHistory
+        key={`${report.id}:${historyVersion}`}
+        reportId={report.id}
+      />
     </section>
   );
 }
