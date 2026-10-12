@@ -64,6 +64,17 @@ export default function DashboardLayout() {
           >
             Laporan
           </NavLink>
+
+          {user.role === "admin" && (
+            <NavLink
+                to="/dashboard/users"
+                className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""}`
+                }
+            >
+                User Management
+            </NavLink>
+        )}
         </nav>
 
         <div className="sidebar-footer">

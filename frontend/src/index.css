@@ -757,3 +757,155 @@ button:disabled {
     padding: 18px;
   }
 }
+
+
+/* Admin User Management */
+
+.users-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.users-form-card {
+  padding: 24px;
+}
+
+.users-form-card h2,
+.users-list-heading h2 {
+  margin: 0 0 8px;
+}
+
+.users-form-card .form-group {
+  margin-top: 20px;
+}
+
+.users-form-card select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+}
+
+.users-form-card select:focus {
+  outline: 2px solid #93c5fd;
+  border-color: #2563eb;
+}
+
+.users-form-card .primary-button {
+  margin-top: 24px;
+}
+
+.success-message {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 14px;
+}
+
+.users-list-card {
+  min-width: 0;
+}
+
+.users-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.users-list-heading p {
+  margin-bottom: 0;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.users-table th,
+.users-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.users-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+}
+
+.users-table td strong {
+  display: block;
+}
+
+.user-email {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.user-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.user-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.user-inactive {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.users-list-footnote {
+  margin: 0;
+  padding: 16px 24px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .users-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .users-form-card {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-form-card {
+    padding: 18px;
+  }
+
+  .users-list-heading {
+    padding: 18px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .users-table {
+    min-width: 580px;
+  }
+}

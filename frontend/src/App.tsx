@@ -15,6 +15,7 @@ import ReportsPage from "./pages/ReportsPage";
 import LoginPage from "./pages/LoginPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
 import ReportFormPage from "./pages/ReportFormPage";
+import UsersPage from "./pages/UsersPage";
 
 function ProtectedRoute({
   children,
@@ -59,6 +60,21 @@ function LoginRoute() {
   return <LoginPage />;
 }
 
+function AdminOnlyRoute({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const { user } = useAuth();
+  console.log("user role", user?.role);
+
+  if (user?.role !== "admin") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <Routes>
@@ -101,12 +117,22 @@ export default function App() {
           path="reports/:id/edit"
           element={<ReportFormPage mode="edit" />}
         />
+
+        <Route
+          path="users"
+          element={
+            <AdminOnlyRoute>
+              <UsersPage />
+            </AdminOnlyRoute>
+          }
+        />
       </Route>
 
       <Route
         path="*"
         element={<Navigate to="/dashboard" replace />}
       />
+
     </Routes>
   );
 }
