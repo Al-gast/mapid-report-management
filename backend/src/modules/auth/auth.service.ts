@@ -1,4 +1,4 @@
-import argon2 from "argon2";
+import { verifyPassword } from "../../lib/password.js";
 import { randomBytes, createHash } from "node:crypto";
 import { pool } from "../../config/database.js";
 
@@ -45,7 +45,7 @@ export async function verifyCredentials(
     return null;
   }
 
-  const validPassword = await argon2.verify(
+  const validPassword = await verifyPassword(
     user.password_hash,
     password
   );

@@ -1,5 +1,5 @@
 import "dotenv/config";
-import argon2 from "argon2";
+import { hashPassword } from "../src/lib/password.js";
 import { pool } from "../src/config/database.js";
 
 type ExistingUser = {
@@ -55,12 +55,7 @@ async function seedAdmin() {
     return;
   }
 
-  const passwordHash = await argon2.hash(password, {
-    type: argon2.argon2id,
-    memoryCost: 19456,
-    timeCost: 2,
-    parallelism: 1,
-  });
+  const passwordHash = await hashPassword(password);
 
   const result = await pool.query<{ id: string }>(
     `INSERT INTO app.users (

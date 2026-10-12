@@ -1,18 +1,31 @@
 import express from "express";
 import { pool } from "./config/database.js";
 import cookieParser from "cookie-parser";
+
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
+
 import { errorHandler } from "./middleware/error.middleware.js";
 import {
   requireTrustedOrigin,
 } from "./middleware/csrf.middleware.js";
 
 const app = express();
+
+app.disable("x-powered-by");
+// Global Middleware
 app.use(express.json({ limit: "16kb" }));
 app.use(cookieParser());
 
+// CSRF Protection Middleware
+app.use(requireTrustedOrigin);
+
 app.use(express.json());
+
+app.use("/api", (_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
 
 // Existing health-check routes tetap di sini
 app.get("/api/health", (_req, res) => {
@@ -46,8 +59,8 @@ app.use("/api/auth", authRouter);
 // Protected user management routes
 app.use("/api/users", usersRouter);
 
-app.use(requireTrustedOrigin);
 // Error handler
 app.use(errorHandler);
 
 export default app;
+

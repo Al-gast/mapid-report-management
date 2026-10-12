@@ -1,4 +1,4 @@
-import argon2 from "argon2";
+import { hashPassword } from "../../lib/password.js";
 
 import { pool } from "../../config/database.js";
 
@@ -18,14 +18,8 @@ export type PublicUser = {
 export async function createUser(
   input: CreateUserInput
 ): Promise<PublicUser> {
-  const passwordHash = await argon2.hash(
-    input.password,
-    {
-      type: argon2.argon2id,
-      memoryCost: 19456,
-      timeCost: 2,
-      parallelism: 1,
-    }
+  const passwordHash = await hashPassword(
+    input.password
   );
 
   const result = await pool.query<PublicUser>(
