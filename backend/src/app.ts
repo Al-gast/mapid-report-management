@@ -30,7 +30,7 @@ app.use("/api", (_req, res, next) => {
   next();
 });
 
-// Existing health-check routes tetap di sini
+// Health-check routes
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -61,6 +61,9 @@ app.use("/api/auth", authRouter);
 
 // Protected user management routes
 app.use("/api/users", usersRouter);
+
+// Protected report management routes
+app.use("/api/reports", reportsRouter);
 
 // Error handler
 app.use(errorHandler);

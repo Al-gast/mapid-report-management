@@ -19,6 +19,16 @@ import {
   updateReport,
 } from "./reports.service.js";
 
+import {
+  updateStatusSchema,
+  approvalHistoryQuerySchema,
+} from "./approvals.schema.js";
+
+import {
+  changeReportStatus,
+  getApprovalHistory,
+} from "./approvals.service.js";
+
 export const reportsRouter = Router();
 
 // Semua report endpoint memerlukan authentication
@@ -170,3 +180,100 @@ reportsRouter.patch(
     });
   }
 );
+
+// PATCH /api/reports/:id/status
+reportsRouter.patch(
+  "/:id/status",
+  requireRole("approver"),
+  async (req, res) => {
+    const paramsValidation =
+      reportParamsSchema.safeParse(req.params);
+
+    if (!paramsValidation.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid report ID",
+      });
+    }
+
+    const bodyValidation =
+      updateStatusSchema.safeParse(req.body);
+
+    if (!bodyValidation.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status",
+      });
+    }
+
+    const result = await changeReportStatus(
+      paramsValidation.data.id,
+      req.authUser!.id,
+      bodyValidation.data.status
+    );
+
+    if (result.kind === "not_found") {
+      return res.status(404).json({
+        success: false,
+        message: "Report not found",
+      });
+    }
+
+    if (result.kind === "unchanged") {
+      return res.status(409).json({
+        success: false,
+        message: "Report already has this status",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Report status updated successfully",
+      data: {
+        report: result.report,
+        approval: result.approval,
+      },
+    });
+  }
+);
+
+// GET /api/reports/:id/history
+reportsRouter.get("/:id/history", async (req, res) => {
+  const paramsValidation =
+    reportParamsSchema.safeParse(req.params);
+
+  if (!paramsValidation.success) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid report ID",
+    });
+  }
+
+  const queryValidation =
+    approvalHistoryQuerySchema.safeParse(req.query);
+
+  if (!queryValidation.success) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid query parameters",
+    });
+  }
+
+  const result = await getApprovalHistory(
+    paramsValidation.data.id,
+    req.authUser!,
+    queryValidation.data
+  );
+
+  if (!result) {
+    return res.status(404).json({
+      success: false,
+      message: "Report not found",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
