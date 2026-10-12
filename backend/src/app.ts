@@ -4,6 +4,9 @@ import cookieParser from "cookie-parser";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+import {
+  requireTrustedOrigin,
+} from "./middleware/csrf.middleware.js";
 
 const app = express();
 app.use(express.json({ limit: "16kb" }));
@@ -43,7 +46,8 @@ app.use("/api/auth", authRouter);
 // Protected user management routes
 app.use("/api/users", usersRouter);
 
-// Error handler harus paling akhir
+app.use(requireTrustedOrigin);
+// Error handler
 app.use(errorHandler);
 
 export default app;
