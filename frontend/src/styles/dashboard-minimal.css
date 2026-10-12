@@ -1,0 +1,283 @@
+
+/* =========================================
+   MAPID Minimal Dashboard
+   ========================================= */
+
+.mapid-minimal-shell,
+.mapid-minimal-shell * {
+  box-sizing: border-box;
+}
+
+.mapid-minimal-shell {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* Sidebar */
+
+.mapid-minimal-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 26px 12px;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.mapid-minimal-brand {
+  padding: 0 14px 24px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+
+  font-size: 20px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+}
+
+.mapid-minimal-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mapid-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 43px;
+  padding: 10px 14px;
+
+  border-radius: 8px;
+  color: #dbeafe;
+
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.mapid-nav-link svg {
+  flex-shrink: 0;
+}
+
+.mapid-nav-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.mapid-nav-link.is-active {
+  background: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.mapid-nav-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Main */
+
+.mapid-minimal-main {
+  min-width: 0;
+}
+
+.mapid-minimal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  min-height: 66px;
+  padding: 14px 28px;
+
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mapid-minimal-topbar h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.mapid-minimal-account {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.mapid-minimal-username {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.mapid-minimal-logout {
+  min-height: 36px;
+  padding: 7px 14px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #334155;
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mapid-minimal-logout:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.mapid-minimal-logout:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.mapid-minimal-logout:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.mapid-minimal-alert {
+  margin: 16px 28px 0;
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.mapid-minimal-content {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+/* Dashboard */
+
+.mapid-minimal-home h1 {
+  margin: 0 0 20px;
+  color: #0f172a;
+  font-size: 23px;
+  font-weight: 650;
+}
+
+.mapid-minimal-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 760px;
+}
+
+.mapid-minimal-shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  min-height: 90px;
+  padding: 20px;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.mapid-minimal-shortcut:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.mapid-minimal-shortcut:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .mapid-minimal-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .mapid-minimal-sidebar {
+    position: static;
+    height: auto;
+    padding: 14px 16px 10px;
+  }
+
+  .mapid-minimal-brand {
+    margin-bottom: 10px;
+    padding: 0 0 14px;
+    font-size: 18px;
+  }
+
+  .mapid-minimal-navigation {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+
+  .mapid-nav-link {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 10px 12px;
+  }
+
+  .mapid-minimal-topbar {
+    min-height: 60px;
+    padding: 12px 20px;
+  }
+
+  .mapid-minimal-content {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mapid-minimal-username {
+    display: none;
+  }
+
+  .mapid-minimal-shortcuts {
+    grid-template-columns: 1fr;
+  }
+
+  .mapid-minimal-shortcut {
+    min-height: 74px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapid-nav-link,
+  .mapid-minimal-shortcut {
+    transition: none;
+  }
+}

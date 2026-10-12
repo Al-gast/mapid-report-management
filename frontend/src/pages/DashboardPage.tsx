@@ -1,42 +1,63 @@
 
 import { Link } from "react-router";
-import { useAuth } from "../features/auth/useAuth";
-import type { UserRole } from "../features/auth/auth.api";
 
-const roleDescriptions: Record<UserRole, string> = {
-  admin: "Kelola pengguna dan pantau laporan lapangan.",
-  pelapor: "Buat dan pantau laporan lapangan milik Anda.",
-  approver: "Tinjau laporan dan kelola keputusan persetujuan.",
-};
+import { useAuth } from "../features/auth/useAuth";
+import "../styles/dashboard-minimal.css";
 
 export default function DashboardPage() {
   const { user } = useAuth();
 
   if (!user) return null;
 
+  const shortcuts =
+    user.role === "admin"
+      ? [
+          {
+            label: "Laporan",
+            to: "/dashboard/reports",
+          },
+          {
+            label: "Pengguna",
+            to: "/dashboard/users",
+          },
+        ]
+      : user.role === "pelapor"
+        ? [
+            {
+              label: "Buat Laporan",
+              to: "/dashboard/reports/new",
+            },
+            {
+              label: "Laporan Saya",
+              to: "/dashboard/reports",
+            },
+          ]
+        : [
+            {
+              label: "Perlu Ditinjau",
+              to: "/dashboard/reports?status=pending",
+            },
+            {
+              label: "Semua Laporan",
+              to: "/dashboard/reports",
+            },
+          ];
+
   return (
-    <section>
-      <div className="page-heading">
-        <h1>Selamat datang, {user.name}</h1>
-        <p className="muted">
-          {roleDescriptions[user.role]}
-        </p>
-      </div>
+    <section className="mapid-minimal-home">
+      <h1>Akses Cepat</h1>
 
-      <div className="content-card overview-card">
-        <h2>Report Management</h2>
-
-        <p className="muted">
-          Anda dapat melihat laporan sesuai dengan hak akses
-          akun yang sedang digunakan.
-        </p>
-
-        <Link
-          to="/dashboard/reports"
-          className="primary-link"
-        >
-          Lihat Laporan
-        </Link>
+      <div className="mapid-minimal-shortcuts">
+        {shortcuts.map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            className="mapid-minimal-shortcut"
+          >
+            <span>{item.label}</span>
+            <span aria-hidden="true">→</span>
+          </Link>
+        ))}
       </div>
     </section>
   );

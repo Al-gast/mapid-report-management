@@ -534,3 +534,139 @@
     justify-content: space-between;
   }
 }
+
+
+/* =========================================
+   MAPID Login Refinement
+   ========================================= */
+
+.mapid-login-page {
+  background: #f5f7fb;
+  padding: 24px;
+}
+
+.mapid-login-card {
+  max-width: 410px;
+  padding: 36px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 30px rgba(15, 23, 42, 0.045);
+}
+
+.mapid-login-heading {
+  margin-bottom: 30px;
+}
+
+.mapid-login-brand {
+  margin-bottom: 28px;
+  color: #2563eb;
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.4px;
+}
+
+.mapid-login-heading h1 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #0f172a;
+}
+
+.mapid-login-heading p {
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.mapid-login-form {
+  gap: 20px;
+}
+
+.mapid-login-field {
+  gap: 8px;
+}
+
+.mapid-login-field label {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mapid-login-field input {
+  height: 44px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #0f172a;
+
+  font-size: 14px;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.mapid-login-field input:focus-visible {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13);
+}
+
+.mapid-password-toggle {
+  color: #64748b;
+  border-radius: 6px;
+}
+
+.mapid-password-toggle:hover:not(:disabled) {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.mapid-login-submit {
+  min-height: 44px;
+  margin-top: 4px;
+
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: background-color 0.15s ease;
+}
+
+.mapid-login-submit:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.mapid-login-submit:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.mapid-login-error {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
+  .mapid-login-card {
+    padding: 28px 22px;
+  }
+
+  .mapid-login-brand {
+    margin-bottom: 24px;
+  }
+}
