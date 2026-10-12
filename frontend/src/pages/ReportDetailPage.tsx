@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useLocation, } from "react-router";
 
 import { useAuth } from "../features/auth/useAuth";
 
@@ -49,6 +49,10 @@ function formatDate(value: string) {
 export default function ReportDetailPage() {
   const { id } = useParams<"id">();
   const { user } = useAuth();
+  const location = useLocation();
+
+  const reportsListUrl =
+  `/dashboard/reports${location.search}`;
 
   const [result, setResult] =
     useState<DetailResult | null>(null);
@@ -141,7 +145,7 @@ export default function ReportDetailPage() {
         </button>
 
         <p>
-          <Link to="/dashboard/reports">
+          <Link to={reportsListUrl}>
             Kembali ke daftar laporan
           </Link>
         </p>
@@ -159,7 +163,7 @@ export default function ReportDetailPage() {
   return (
     <section className="report-detail-page">
       <div className="page-heading">
-        <Link to="/dashboard/reports">
+        <Link to={reportsListUrl} className="report-back-link">
           ← Kembali ke laporan
         </Link>
 
@@ -185,7 +189,7 @@ export default function ReportDetailPage() {
 
             {canEdit && (
               <Link
-                to={`/dashboard/reports/${report.id}/edit`}
+                to={`/dashboard/reports/${report.id}/edit${location.search}`}
                 className="primary-link"
               >
                 Edit Laporan

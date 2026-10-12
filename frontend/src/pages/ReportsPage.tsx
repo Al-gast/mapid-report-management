@@ -1,15 +1,30 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { useAuth } from "../features/auth/useAuth";
+
 import {
   reportsApi,
   type ReportListData,
   type ReportStatus,
 } from "../features/reports/reports.api";
 
-type LoadState = "loading" | "success" | "error";
+import { ApiError } from "../lib/api";
+
+type LoadResult =
+  | {
+      key: string;
+      kind: "success";
+      data: ReportListData;
+    }
+  | {
+      key: string;
+      kind: "error";
+      message: string;
+    };
+
+const PAGE_SIZE = 10;
 
 const statusLabels: Record<ReportStatus, string> = {
   pending: "Pending",
@@ -17,8 +32,31 @@ const statusLabels: Record<ReportStatus, string> = {
   rejected: "Rejected",
 };
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleString("id-ID", {
+function parsePage(value: string | null): number {
+  if (!value || !/^[1-9]\d*$/.test(value)) {
+    return 1;
+  }
+
+  const parsed = Number(value);
+
+  if (
+    !Number.isSafeInteger(parsed) ||
+    parsed > 100000
+  ) {
+    return 1;
+  }
+
+  return parsed;
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+
+  return date.toLocaleString("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -27,18 +65,38 @@ function formatDate(value: string) {
 export default function ReportsPage() {
   const { user } = useAuth();
 
-  const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<
-    ReportStatus | "all"
-  >("all");
-  const [sort, setSort] = useState<"asc" | "desc">("desc");
+  const [searchParams, setSearchParams] =
+    useSearchParams();
 
-  const [reloadKey, setReloadKey] = useState(0);
-  const [data, setData] = useState<ReportListData | null>(
-    null
-  );
-  const [loadState, setLoadState] =
-    useState<LoadState>("loading");
+  const rawStatus = searchParams.get("status");
+
+  const status: ReportStatus | "all" =
+    rawStatus === "pending" ||
+    rawStatus === "approved" ||
+    rawStatus === "rejected"
+      ? rawStatus
+      : "all";
+
+  const sort: "asc" | "desc" =
+    searchParams.get("sort") === "asc"
+      ? "asc"
+      : "desc";
+
+  const page = parsePage(searchParams.get("page"));
+
+  const [retryKey, setRetryKey] = useState(0);
+  const [result, setResult] =
+    useState<LoadResult | null>(null);
+
+  const requestKey =
+    `${page}:${status}:${sort}:${retryKey}`;
+
+  // Teruskan konteks filter ketika membuka detail
+  const queryString = searchParams.toString();
+
+  const querySuffix = queryString
+    ? `?${queryString}`
+    : "";
 
   useEffect(() => {
     let active = true;
@@ -46,48 +104,100 @@ export default function ReportsPage() {
     reportsApi
       .list({
         page,
-        limit: 10,
-        sort,
+        limit: PAGE_SIZE,
         status: status === "all" ? undefined : status,
+        sort,
       })
-      .then((result) => {
+      .then((data) => {
         if (!active) return;
 
-        setData(result);
-        setLoadState("success");
+        setResult({
+          key: requestKey,
+          kind: "success",
+          data,
+        });
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!active) return;
 
-        setLoadState("error");
+        const message =
+          error instanceof ApiError &&
+          error.status === 401
+            ? "Session tidak valid. Silakan login kembali."
+            : "Gagal memuat laporan.";
+
+        setResult({
+          key: requestKey,
+          kind: "error",
+          message,
+        });
       });
 
     return () => {
       active = false;
     };
-  }, [page, status, sort, reloadKey]);
+  }, [page, status, sort, requestKey]);
 
-  function changeStatus(value: ReportStatus | "all") {
-    setLoadState("loading");
-    setPage(1);
-    setStatus(value);
+  function changeStatus(value: string) {
+    const next = new URLSearchParams(searchParams);
+
+    if (
+      value === "pending" ||
+      value === "approved" ||
+      value === "rejected"
+    ) {
+      next.set("status", value);
+    } else {
+      next.delete("status");
+    }
+
+    // Filter baru selalu mulai dari halaman pertama
+    next.delete("page");
+
+    setSearchParams(next);
   }
 
-  function changeSort(value: "asc" | "desc") {
-    setLoadState("loading");
-    setPage(1);
-    setSort(value);
+  function changeSort(value: string) {
+    const next = new URLSearchParams(searchParams);
+
+    if (value === "asc") {
+      next.set("sort", "asc");
+    } else {
+      next.delete("sort");
+    }
+
+    next.delete("page");
+
+    setSearchParams(next);
   }
 
-  function changePage(value: number) {
-    setLoadState("loading");
-    setPage(value);
+  function changePage(nextPage: number) {
+    const next = new URLSearchParams(searchParams);
+
+    if (nextPage <= 1) {
+      next.delete("page");
+    } else {
+      next.set("page", String(nextPage));
+    }
+
+    setSearchParams(next);
+  }
+
+  function resetFilters() {
+    setSearchParams(new URLSearchParams());
   }
 
   function retry() {
-    setLoadState("loading");
-    setReloadKey((current) => current + 1);
+    setRetryKey((previous) => previous + 1);
   }
+
+  const current =
+    result?.key === requestKey ? result : null;
+
+  const hasActiveFilters =
+    status !== "all" ||
+    sort !== "desc" ||
+    page !== 1;
 
   const title =
     user?.role === "pelapor"
@@ -98,85 +208,127 @@ export default function ReportsPage() {
     <section className="reports-page">
       <div className="page-heading page-heading-actions">
         <div>
-            <h1>{title}</h1>
-            <p className="muted">
-            Daftar laporan lapangan dan status persetujuan.
-            </p>
+          <h1>{title}</h1>
+
+          <p className="muted">
+            Kelola dan pantau laporan lapangan.
+          </p>
         </div>
 
         {user?.role === "pelapor" && (
-            <Link
-            to="/dashboard/reports/new"
+          <Link
+            to={`/dashboard/reports/new${querySuffix}`}
             className="primary-link"
-            >
+          >
             + Tambah Laporan
-            </Link>
+          </Link>
         )}
-    </div>
+      </div>
 
       <div className="content-card">
         <div className="report-toolbar">
-          <label>
+          <label htmlFor="status-filter">
             Status
             <select
+              id="status-filter"
               value={status}
               onChange={(event) =>
-                changeStatus(
-                  event.target.value as ReportStatus | "all"
-                )
+                changeStatus(event.target.value)
               }
             >
-              <option value="all">Semua status</option>
+              <option value="all">Semua Status</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
             </select>
           </label>
 
-          <label>
+          <label htmlFor="sort-filter">
             Urutan
             <select
+              id="sort-filter"
               value={sort}
               onChange={(event) =>
-                changeSort(event.target.value as "asc" | "desc")
+                changeSort(event.target.value)
               }
             >
               <option value="desc">Terbaru</option>
               <option value="asc">Terlama</option>
             </select>
           </label>
+
+          <div className="report-filter-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={resetFilters}
+              disabled={!hasActiveFilters}
+            >
+              Reset Filter
+            </button>
+          </div>
         </div>
 
-        {loadState === "loading" && (
+        {hasActiveFilters && (
+          <div className="active-filter-summary">
+            Filter aktif:
+            {" "}
+            <strong>
+              {status === "all"
+                ? "Semua Status"
+                : statusLabels[status]}
+            </strong>
+            {" · "}
+            {sort === "desc" ? "Terbaru" : "Terlama"}
+            {" · "}
+            Halaman {page}
+          </div>
+        )}
+
+        {!current && (
           <p className="table-message" role="status">
             Memuat laporan...
           </p>
         )}
 
-        {loadState === "error" && (
+        {current?.kind === "error" && (
           <div className="table-message" role="alert">
-            <p>Gagal memuat laporan.</p>
+            <p>{current.message}</p>
+
             <button
+              type="button"
               className="secondary-button"
               onClick={retry}
             >
-              Coba lagi
+              Coba Lagi
             </button>
           </div>
         )}
 
-        {loadState === "success" && data && (
+        {current?.kind === "success" && (
           <>
-            {data.reports.length === 0 ? (
-              <p className="table-message">
-                Belum ada laporan yang sesuai.
-              </p>
+            {current.data.reports.length === 0 ? (
+              <div className="table-message">
+                <p>
+                  Tidak ada laporan yang sesuai.
+                </p>
+
+                {page > 1 && (
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => changePage(1)}
+                  >
+                    Kembali ke Halaman 1
+                  </button>
+                )}
+              </div>
             ) : (
               <div className="table-wrapper">
                 <table className="reports-table">
                   <thead>
                     <tr>
-                      <th>Nama laporan</th>
+                      <th>Nama Laporan</th>
                       <th>Status</th>
                       <th>Dibuat</th>
                       <th>Aksi</th>
@@ -184,10 +336,11 @@ export default function ReportsPage() {
                   </thead>
 
                   <tbody>
-                    {data.reports.map((report) => (
+                    {current.data.reports.map((report) => (
                       <tr key={report.id}>
                         <td>
                           <strong>{report.name}</strong>
+
                           <span className="report-description">
                             {report.description}
                           </span>
@@ -195,17 +348,30 @@ export default function ReportsPage() {
 
                         <td>
                           <span
-                            className={`status-badge status-${report.status}`}
+                            className={
+                              `status-badge status-${report.status}`
+                            }
                           >
                             {statusLabels[report.status]}
                           </span>
                         </td>
 
-                        <td>{formatDate(report.created_at)}</td>
                         <td>
-                            <Link to={`/dashboard/reports/${report.id}`}>
-                                Lihat Detail
-                            </Link>
+                          {formatDate(report.created_at)}
+                        </td>
+
+                        <td>
+                          <Link
+                            className="report-detail-link"
+                            to={
+                              `/dashboard/reports/${report.id}${querySuffix}`
+                            }
+                            aria-label={
+                              `Lihat detail laporan ${report.name}`
+                            }
+                          >
+                            Lihat Detail →
+                          </Link>
                         </td>
                       </tr>
                     ))}
@@ -216,28 +382,36 @@ export default function ReportsPage() {
 
             <div className="table-pagination">
               <span>
-                Total {data.pagination.total} laporan
+                Total {current.data.pagination.total} laporan
               </span>
 
               <div className="pagination-controls">
                 <button
+                  type="button"
                   className="secondary-button"
                   disabled={page <= 1}
                   onClick={() => changePage(page - 1)}
                 >
-                  Sebelumnya
+                  ← Sebelumnya
                 </button>
 
                 <span>
-                  {page} / {Math.max(1, data.pagination.totalPages)}
+                  {page} /{" "}
+                  {Math.max(
+                    1,
+                    current.data.pagination.totalPages
+                  )}
                 </span>
 
                 <button
+                  type="button"
                   className="secondary-button"
-                  disabled={page >= data.pagination.totalPages}
+                  disabled={
+                    page >= current.data.pagination.totalPages
+                  }
                   onClick={() => changePage(page + 1)}
                 >
-                  Berikutnya
+                  Berikutnya →
                 </button>
               </div>
             </div>

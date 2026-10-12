@@ -10,6 +10,7 @@ import {
   Navigate,
   useNavigate,
   useParams,
+  useLocation,
 } from "react-router";
 
 import { useAuth } from "../features/auth/useAuth";
@@ -38,7 +39,7 @@ export default function ReportFormPage({ mode }: Props) {
   const navigate = useNavigate();
   const { id } = useParams<"id">();
   const { user } = useAuth();
-
+  const location = useLocation();
   const [form, setForm] = useState<ReportInput>(emptyForm);
   const [loaded, setLoaded] = useState<LoadResult | null>(
     null
@@ -46,6 +47,7 @@ export default function ReportFormPage({ mode }: Props) {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const reportsListUrl = `/dashboard/reports${location.search}`;
 
   useEffect(() => {
     if (mode !== "edit" || !id || user?.role !== "pelapor") {
@@ -107,7 +109,7 @@ export default function ReportFormPage({ mode }: Props) {
           <p className="error-message" role="alert">
             {loaded.message}
           </p>
-          <Link to="/dashboard/reports">
+          <Link to={reportsListUrl}>
             Kembali ke daftar laporan
           </Link>
         </div>
@@ -127,7 +129,7 @@ export default function ReportFormPage({ mode }: Props) {
             Hanya laporan pending milik sendiri
             yang dapat diedit.
           </p>
-          <Link to={`/dashboard/reports/${report.id}`}>
+          <Link to={`/dashboard/reports/${report.id}${location.search}`}>
             Kembali ke detail
           </Link>
         </div>
@@ -170,9 +172,12 @@ export default function ReportFormPage({ mode }: Props) {
           ? await reportsApi.create(payload)
           : await reportsApi.update(id!, payload);
 
-      navigate(`/dashboard/reports/${report.id}`, {
-        replace: true,
-      });
+      navigate(
+        `/dashboard/reports/${report.id}${location.search}`,
+        {
+            replace: true,
+        }
+     );
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 409) {
@@ -193,9 +198,9 @@ export default function ReportFormPage({ mode }: Props) {
 
   const isEdit = mode === "edit";
   const cancelUrl =
-    isEdit && id
-      ? `/dashboard/reports/${id}`
-      : "/dashboard/reports";
+  isEdit && id
+    ? `/dashboard/reports/${id}${location.search}`
+    : reportsListUrl;
 
   return (
     <section>
