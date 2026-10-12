@@ -2,6 +2,8 @@ import express from "express";
 import { pool } from "./config/database.js";
 import cookieParser from "cookie-parser";
 import { authRouter } from "./modules/auth/auth.routes.js";
+import { usersRouter } from "./modules/users/users.routes.js";
+import { errorHandler } from "./middleware/error.middleware.js";
 
 const app = express();
 app.use(express.json({ limit: "16kb" }));
@@ -9,6 +11,7 @@ app.use(cookieParser());
 
 app.use(express.json());
 
+// Existing health-check routes tetap di sini
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -34,6 +37,13 @@ app.get("/api/health/db", async (_req, res) => {
   }
 });
 
+// Authentication routes
 app.use("/api/auth", authRouter);
+
+// Protected user management routes
+app.use("/api/users", usersRouter);
+
+// Error handler harus paling akhir
+app.use(errorHandler);
 
 export default app;

@@ -1,6 +1,7 @@
 import { Router, type Request } from "express";
 import { z } from "zod";
 import { rateLimit } from "express-rate-limit";
+import { requireAuth } from "../../middleware/auth.middleware.js";
 
 import {
   verifyCredentials,
@@ -92,28 +93,12 @@ authRouter.post("/login", loginLimiter, async (req, res) => {
 });
 
 // GET /api/auth/me
-authRouter.get("/me", async (req, res) => {
-  const token = getCookieToken(req);
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthenticated",
-    });
-  }
-
-  const user = await getSessionUser(token);
-
-  if (!user) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired session",
-    });
-  }
-
-  return res.status(200).json({
+authRouter.get("/me", requireAuth, (req, res) => {
+  res.status(200).json({
     success: true,
-    data: { user },
+    data: {
+      user: req.authUser,
+    },
   });
 });
 
