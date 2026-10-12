@@ -8,6 +8,8 @@ import { useNavigate } from "react-router";
 import { ApiError } from "../lib/api";
 import { useAuth } from "../features/auth/useAuth";
 
+import PasswordField from "../components/PasswordField";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -76,24 +78,16 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">
-              Password
-            </label>
-
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
-              required
-              disabled={loading}
-            />
-          </div>
+          <PasswordField
+            id="password"
+            label="Password"
+            value={password}
+            onChange={setPassword}
+            placeholder="Enter your password"
+            autoComplete="current-password"
+            required
+            disabled={loading}
+           />
 
           {error && (
             <p className="error-message" role="alert">

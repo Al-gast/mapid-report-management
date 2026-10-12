@@ -16,6 +16,8 @@ import {
 
 import type { UserRole } from "../features/auth/auth.api";
 
+import PasswordField from "../components/PasswordField";
+
 type UserForm = CreateUserInput & {
   confirmPassword: string;
 };
@@ -294,51 +296,43 @@ export default function UsersPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="user-password">
-                Password
-              </label>
-
-              <input
+              <PasswordField
                 id="user-password"
-                type="password"
-                autoComplete="new-password"
+                label="Password"
                 value={form.password}
-                onChange={(event) =>
-                  setForm((previous) => ({
+                onChange={(value) =>
+                    setForm((previous) => ({
                     ...previous,
-                    password: event.target.value,
-                  }))
+                    password: value,
+                    }))
                 }
+                placeholder="Minimal 12 karakter"
+                autoComplete="new-password"
                 minLength={12}
                 maxLength={128}
                 required
                 disabled={submitting}
-                placeholder="Minimal 12 karakter"
-              />
+                />
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirm-password">
-                Konfirmasi Password
-              </label>
-
-              <input
+              <PasswordField
                 id="confirm-password"
-                type="password"
-                autoComplete="new-password"
+                label="Konfirmasi Password"
                 value={form.confirmPassword}
-                onChange={(event) =>
-                  setForm((previous) => ({
+                onChange={(value) =>
+                    setForm((previous) => ({
                     ...previous,
-                    confirmPassword: event.target.value,
-                  }))
+                    confirmPassword: value,
+                    }))
                 }
+                placeholder="Ulangi password"
+                autoComplete="new-password"
                 minLength={12}
                 maxLength={128}
                 required
                 disabled={submitting}
-                placeholder="Ulangi password"
-              />
+                />
             </div>
 
             {formError && (

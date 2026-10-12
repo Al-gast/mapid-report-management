@@ -909,3 +909,56 @@ button:disabled {
     min-width: 580px;
   }
 }
+
+
+/* Password Visibility */
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  cursor: pointer;
+}
+
+.password-toggle-icon:hover:not(:disabled) {
+  color: #2563eb;
+}
+
+.password-toggle-icon:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.password-toggle-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.password-icon {
+  width: 18px;
+  height: 18px;
+}
