@@ -1,3 +1,4 @@
+
 import {
   Navigate,
   Route,
@@ -8,8 +9,10 @@ import type { ReactNode } from "react";
 
 import { useAuth } from "./features/auth/useAuth";
 
-import LoginPage from "./pages/LoginPage";
+import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardPage from "./pages/DashboardPage";
+import ReportsPage from "./pages/ReportsPage";
+import LoginPage from "./pages/LoginPage";
 
 function ProtectedRoute({
   children,
@@ -71,10 +74,13 @@ export default function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <DashboardPage />
+            <DashboardLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<DashboardPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+      </Route>
 
       <Route
         path="*"
