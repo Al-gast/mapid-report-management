@@ -14,7 +14,7 @@ app.get("/api/health", (_req, res) => {
 
 app.get("/api/health/db", async (_req, res) => {
   try {
-    await pool.query("SELECT 1");
+    await pool.query("SELECT 1 FROM app.users LIMIT 1");
 
     res.status(200).json({
       success: true,
