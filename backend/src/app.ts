@@ -1,7 +1,11 @@
 import express from "express";
 import { pool } from "./config/database.js";
+import cookieParser from "cookie-parser";
+import { authRouter } from "./modules/auth/auth.routes.js";
 
 const app = express();
+app.use(express.json({ limit: "16kb" }));
+app.use(cookieParser());
 
 app.use(express.json());
 
@@ -29,5 +33,7 @@ app.get("/api/health/db", async (_req, res) => {
     });
   }
 });
+
+app.use("/api/auth", authRouter);
 
 export default app;
