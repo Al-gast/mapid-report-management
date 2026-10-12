@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { useAuth } from "../features/auth/useAuth";
-
 import {
   reportsApi,
   type ReportListData,
   type ReportStatus,
 } from "../features/reports/reports.api";
-
 import { ApiError } from "../lib/api";
+
+import "../styles/targeted-polish.css";
 
 type LoadResult =
   | {
@@ -28,8 +28,8 @@ const PAGE_SIZE = 10;
 
 const statusLabels: Record<ReportStatus, string> = {
   pending: "Pending",
-  approved: "Approved",
-  rejected: "Rejected",
+  approved: "Disetujui",
+  rejected: "Ditolak",
 };
 
 function parsePage(value: string | null): number {
@@ -39,10 +39,7 @@ function parsePage(value: string | null): number {
 
   const parsed = Number(value);
 
-  if (
-    !Number.isSafeInteger(parsed) ||
-    parsed > 100000
-  ) {
+  if (!Number.isSafeInteger(parsed) || parsed > 100000) {
     return 1;
   }
 
@@ -85,13 +82,13 @@ export default function ReportsPage() {
   const page = parsePage(searchParams.get("page"));
 
   const [retryKey, setRetryKey] = useState(0);
+
   const [result, setResult] =
     useState<LoadResult | null>(null);
 
   const requestKey =
     `${page}:${status}:${sort}:${retryKey}`;
 
-  // Teruskan konteks filter ketika membuka detail
   const queryString = searchParams.toString();
 
   const querySuffix = queryString
@@ -105,7 +102,8 @@ export default function ReportsPage() {
       .list({
         page,
         limit: PAGE_SIZE,
-        status: status === "all" ? undefined : status,
+        status:
+          status === "all" ? undefined : status,
         sort,
       })
       .then((data) => {
@@ -120,11 +118,19 @@ export default function ReportsPage() {
       .catch((error: unknown) => {
         if (!active) return;
 
-        const message =
-          error instanceof ApiError &&
-          error.status === 401
-            ? "Session tidak valid. Silakan login kembali."
-            : "Gagal memuat laporan.";
+        let message = "Gagal memuat laporan.";
+
+        if (error instanceof ApiError) {
+          if (error.status === 401) {
+            message =
+              "Sesi telah berakhir. Silakan masuk kembali.";
+          } else if (error.status === 403) {
+            message =
+              "Anda tidak memiliki akses ke laporan.";
+          } else {
+            message = error.message;
+          }
+        }
 
         setResult({
           key: requestKey,
@@ -151,9 +157,7 @@ export default function ReportsPage() {
       next.delete("status");
     }
 
-    // Filter baru selalu mulai dari halaman pertama
     next.delete("page");
-
     setSearchParams(next);
   }
 
@@ -167,7 +171,6 @@ export default function ReportsPage() {
     }
 
     next.delete("page");
-
     setSearchParams(next);
   }
 
@@ -187,10 +190,6 @@ export default function ReportsPage() {
     setSearchParams(new URLSearchParams());
   }
 
-  function retry() {
-    setRetryKey((previous) => previous + 1);
-  }
-
   const current =
     result?.key === requestKey ? result : null;
 
@@ -202,103 +201,109 @@ export default function ReportsPage() {
   const title =
     user?.role === "pelapor"
       ? "Laporan Saya"
-      : "Semua Laporan";
+      : "Daftar Laporan";
 
   return (
-    <section className="reports-page">
-      <div className="page-heading page-heading-actions">
-        <div>
-          <h1>{title}</h1>
-
-          <p className="muted">
-            Kelola dan pantau laporan lapangan.
-          </p>
-        </div>
+    <section className="mapid-reports-page">
+      <div className="mapid-reports-header">
+        <h1>{title}</h1>
 
         {user?.role === "pelapor" && (
           <Link
             to={`/dashboard/reports/new${querySuffix}`}
-            className="primary-link"
+            className="mapid-reports-primary"
           >
             + Tambah Laporan
           </Link>
         )}
       </div>
 
-      <div className="content-card">
-        <div className="report-toolbar">
-          <label htmlFor="status-filter">
-            Status
-            <select
-              id="status-filter"
-              value={status}
-              onChange={(event) =>
-                changeStatus(event.target.value)
-              }
-            >
-              <option value="all">Semua Status</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </label>
+      <div className="content-card mapid-reports-card">
+        <div className="mapid-reports-toolbar">
+          <div className="mapid-filter-field">
+            <label htmlFor="status-filter">
+              Status
+            </label>
 
-          <label htmlFor="sort-filter">
-            Urutan
-            <select
-              id="sort-filter"
-              value={sort}
-              onChange={(event) =>
-                changeSort(event.target.value)
-              }
-            >
-              <option value="desc">Terbaru</option>
-              <option value="asc">Terlama</option>
-            </select>
-          </label>
-
-          <div className="report-filter-actions">
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={resetFilters}
-              disabled={!hasActiveFilters}
-            >
-              Reset Filter
-            </button>
+            <div className="mapid-filter-select">
+              <select
+                id="status-filter"
+                value={status}
+                onChange={(event) =>
+                  changeStatus(event.target.value)
+                }
+              >
+                <option value="all">Semua status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Disetujui</option>
+                <option value="rejected">Ditolak</option>
+              </select>
+            </div>
           </div>
+
+          <div className="mapid-filter-field">
+            <label htmlFor="sort-filter">
+              Urutan
+            </label>
+
+            <div className="mapid-filter-select">
+              <select
+                id="sort-filter"
+                value={sort}
+                onChange={(event) =>
+                  changeSort(event.target.value)
+                }
+              >
+                <option value="desc">Terbaru</option>
+                <option value="asc">Terlama</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="mapid-reports-secondary mapid-reset-button"
+            disabled={!hasActiveFilters}
+            onClick={resetFilters}
+          >
+            Reset
+          </button>
         </div>
 
         {hasActiveFilters && (
-          <div className="active-filter-summary">
-            Filter aktif:
-            {" "}
-            <strong>
-              {status === "all"
-                ? "Semua Status"
-                : statusLabels[status]}
-            </strong>
-            {" · "}
+          <div className="mapid-active-filters">
+            {status === "all"
+              ? "Semua status"
+              : statusLabels[status]}
+            <span aria-hidden="true">·</span>
             {sort === "desc" ? "Terbaru" : "Terlama"}
-            {" · "}
+            <span aria-hidden="true">·</span>
             Halaman {page}
           </div>
         )}
 
         {!current && (
-          <p className="table-message" role="status">
+          <div
+            className="mapid-reports-message"
+            role="status"
+          >
             Memuat laporan...
-          </p>
+          </div>
         )}
 
         {current?.kind === "error" && (
-          <div className="table-message" role="alert">
+          <div
+            className="mapid-reports-message"
+            role="alert"
+          >
             <p>{current.message}</p>
 
             <button
               type="button"
-              className="secondary-button"
-              onClick={retry}
+              className="mapid-reports-secondary"
+              onClick={() =>
+                setRetryKey((previous) => previous + 1)
+              }
             >
               Coba Lagi
             </button>
@@ -308,24 +313,22 @@ export default function ReportsPage() {
         {current?.kind === "success" && (
           <>
             {current.data.reports.length === 0 ? (
-              <div className="table-message">
-                <p>
-                  Tidak ada laporan yang sesuai.
-                </p>
+              <div className="mapid-reports-message">
+                <p>Tidak ada laporan ditemukan.</p>
 
                 {page > 1 && (
                   <button
                     type="button"
-                    className="secondary-button"
+                    className="mapid-reports-secondary"
                     onClick={() => changePage(1)}
                   >
-                    Kembali ke Halaman 1
+                    Ke Halaman 1
                   </button>
                 )}
               </div>
             ) : (
-              <div className="table-wrapper">
-                <table className="reports-table">
+              <div className="mapid-reports-scroll">
+                <table className="mapid-reports-table">
                   <thead>
                     <tr>
                       <th>Nama Laporan</th>
@@ -339,38 +342,41 @@ export default function ReportsPage() {
                     {current.data.reports.map((report) => (
                       <tr key={report.id}>
                         <td>
-                          <strong>{report.name}</strong>
+                          <div className="mapid-report-name">
+                            {report.name}
+                          </div>
 
-                          <span className="report-description">
+                          <div className="mapid-report-description">
                             {report.description}
-                          </span>
+                          </div>
                         </td>
 
                         <td>
                           <span
                             className={
-                              `status-badge status-${report.status}`
+                              `mapid-status mapid-status-${report.status}`
                             }
                           >
                             {statusLabels[report.status]}
                           </span>
                         </td>
 
-                        <td>
+                        <td className="mapid-date-cell">
                           {formatDate(report.created_at)}
                         </td>
 
                         <td>
                           <Link
-                            className="report-detail-link"
+                            className="mapid-detail-link"
                             to={
                               `/dashboard/reports/${report.id}${querySuffix}`
                             }
                             aria-label={
-                              `Lihat detail laporan ${report.name}`
+                              `Lihat detail ${report.name}`
                             }
                           >
-                            Lihat Detail →
+                            Detail
+                            <span aria-hidden="true"> →</span>
                           </Link>
                         </td>
                       </tr>
@@ -380,22 +386,22 @@ export default function ReportsPage() {
               </div>
             )}
 
-            <div className="table-pagination">
+            <div className="mapid-reports-pagination">
               <span>
-                Total {current.data.pagination.total} laporan
+                {current.data.pagination.total} laporan
               </span>
 
-              <div className="pagination-controls">
+              <div className="mapid-pagination-actions">
                 <button
                   type="button"
-                  className="secondary-button"
+                  className="mapid-reports-secondary"
                   disabled={page <= 1}
                   onClick={() => changePage(page - 1)}
                 >
-                  ← Sebelumnya
+                  Sebelumnya
                 </button>
 
-                <span>
+                <span className="mapid-page-indicator">
                   {page} /{" "}
                   {Math.max(
                     1,
@@ -405,13 +411,13 @@ export default function ReportsPage() {
 
                 <button
                   type="button"
-                  className="secondary-button"
+                  className="mapid-reports-secondary"
                   disabled={
                     page >= current.data.pagination.totalPages
                   }
                   onClick={() => changePage(page + 1)}
                 >
-                  Berikutnya →
+                  Berikutnya
                 </button>
               </div>
             </div>

@@ -1,0 +1,536 @@
+
+/* ========================================
+   MAPID - Targeted UI Polish
+   ======================================== */
+
+/* LOGIN */
+
+.mapid-login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f8fafc;
+}
+
+.mapid-login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.mapid-login-heading {
+  margin-bottom: 28px;
+}
+
+.mapid-login-brand {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 15px;
+  font-weight: 750;
+  color: #2563eb;
+  letter-spacing: 0.5px;
+}
+
+.mapid-login-heading h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.mapid-login-heading p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.mapid-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mapid-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.mapid-login-field label {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mapid-login-field input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 14px;
+}
+
+.mapid-login-field input::placeholder {
+  color: #94a3b8;
+}
+
+.mapid-login-field input:hover:not(:disabled) {
+  border-color: #94a3b8;
+}
+
+.mapid-login-field input:focus-visible {
+  outline: 2px solid #bfdbfe;
+  outline-offset: 1px;
+  border-color: #2563eb;
+}
+
+.mapid-password-field {
+  position: relative;
+}
+
+.mapid-password-field input {
+  padding-right: 48px;
+}
+
+.mapid-password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.mapid-password-toggle:hover:not(:disabled) {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+.mapid-password-toggle:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.mapid-login-submit {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mapid-login-submit:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.mapid-login-submit:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.mapid-login-error {
+  padding: 11px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* REPORTS PAGE */
+
+.mapid-reports-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.mapid-reports-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.mapid-reports-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 650;
+}
+
+.mapid-reports-card {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+/* FILTER */
+
+.mapid-reports-toolbar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mapid-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 170px;
+}
+
+.mapid-filter-field label {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mapid-filter-select {
+  position: relative;
+}
+
+.mapid-filter-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 38px 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mapid-filter-select::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid #64748b;
+  border-bottom: 1.5px solid #64748b;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.mapid-filter-select select:hover {
+  border-color: #94a3b8;
+}
+
+.mapid-filter-select select:focus-visible {
+  outline: 2px solid #bfdbfe;
+  outline-offset: 1px;
+  border-color: #2563eb;
+}
+
+.mapid-active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* BUTTONS */
+
+.mapid-reports-primary,
+.mapid-reports-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mapid-reports-primary {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.mapid-reports-primary:hover {
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.mapid-reports-secondary {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+}
+
+.mapid-reports-secondary:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.mapid-reports-primary:focus-visible,
+.mapid-reports-secondary:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.mapid-reset-button {
+  margin-left: 2px;
+}
+
+.mapid-login-submit:disabled,
+.mapid-password-toggle:disabled,
+.mapid-reports-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* REPORT TABLE */
+
+.mapid-reports-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.mapid-reports-table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.mapid-reports-table th {
+  padding: 13px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mapid-reports-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.mapid-reports-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.mapid-reports-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.mapid-report-name {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mapid-report-description {
+  max-width: 420px;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.mapid-date-cell {
+  white-space: nowrap;
+  color: #64748b;
+}
+
+/* STATUS */
+
+.mapid-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mapid-status-pending {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.mapid-status-approved {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.mapid-status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* DETAIL LINK */
+
+.mapid-detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mapid-detail-link:hover {
+  border-color: #93c5fd;
+  background: #f8fafc;
+}
+
+.mapid-detail-link:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+/* PAGINATION */
+
+.mapid-reports-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.mapid-pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mapid-page-indicator {
+  min-width: 38px;
+  text-align: center;
+  color: #334155;
+  font-weight: 600;
+}
+
+.mapid-reports-message {
+  padding: 40px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.mapid-reports-message p {
+  margin: 0 0 14px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .mapid-login-card {
+    padding: 26px 22px;
+  }
+
+  .mapid-reports-header {
+    align-items: flex-start;
+  }
+
+  .mapid-reports-header h1 {
+    font-size: 21px;
+  }
+
+  .mapid-reports-toolbar {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .mapid-filter-field {
+    flex: 1;
+    min-width: 130px;
+  }
+
+  .mapid-reset-button {
+    margin-left: 0;
+  }
+
+  .mapid-active-filters {
+    padding: 10px 16px;
+  }
+
+  .mapid-reports-pagination {
+    padding: 14px 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .mapid-pagination-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
