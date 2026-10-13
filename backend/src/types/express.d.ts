@@ -1,11 +1,15 @@
-import type { AuthUser } from "../modules/auth/auth.service.js";
+
+export {};
 
 declare global {
   namespace Express {
     interface Request {
-      authUser?: AuthUser;
+      authUser?: {
+        id: string;
+        name: string;
+        email: string;
+        role: "admin" | "pelapor" | "approver";
+      };
     }
   }
 }
-
-export {};
