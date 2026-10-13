@@ -2,6 +2,14 @@
 
 Aplikasi web untuk mengelola laporan lapangan, dibangun menggunakan **Express.js, TypeScript, PostgreSQL, React, dan Vite**.
 
+## Live Demo
+
+- **Aplikasi (Frontend):** https://mapid-report-management.vercel.app/
+- **Backend API:** https://mapid-backend.vercel.app/
+- **Database:** PostgreSQL (Supabase)
+
+Frontend dan backend di-deploy di **Vercel**. Request `/api/*` dari frontend diteruskan ke backend melalui Vercel rewrites.
+
 ## Fitur
 
 - **Admin:** melihat laporan serta membuat akun Pelapor dan Approver.
