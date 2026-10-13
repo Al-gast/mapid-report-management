@@ -1,4 +1,5 @@
 import express from "express";
+import "./types/express.js";
 import { pool } from "./config/database.js";
 import cookieParser from "cookie-parser";
 
